@@ -120,19 +120,13 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
         headers: {
           'customerId': 'cus_TNfmYissyU6g42',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer xxx'
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`
         },
         body: JSON.stringify({
           model: 'openrouter/claude-sonnet-4',
           messages: [
-            {
-              role: 'system',
-              content: systemPrompt
-            },
-            {
-              role: 'user',
-              content: userPrompt
-            }
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
           ],
           temperature: 0.7
         })
