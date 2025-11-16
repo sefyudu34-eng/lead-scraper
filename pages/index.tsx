@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2, Search, Download, Mail, Phone, MapPin, Globe, AlertCircle } from 'lucide-react';
-
+ 
 interface Lead {
   id: string;
   company: string;
