@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Loader2, Search, Download, Mail, Phone, MapPin, Globe, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Search, Download, Mail, Phone, MapPin, Globe, AlertCircle } from 'lucide-react';
 
 interface Lead {
   id: string;
@@ -221,152 +217,127 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            Générateur de Leads B2B
-          </h1>
-          <p className="text-lg text-gray-600">
-            Extraction de leads depuis Google Business Profile et annuaires professionnels
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Générateur de Leads B2B</h1>
+          <p className="text-lg text-gray-600">Extraction de leads depuis Google Business Profile et annuaires professionnels</p>
         </div>
 
-        <Card className="mb-8 shadow-lg border-2">
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
-            <CardTitle className="flex items-center gap-2 text-2xl">
+        <div className="mb-8 shadow-lg border-2 border-gray-200 rounded-xl bg-white p-6">
+          <div className="border-b pb-4 mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
               <Search className="w-6 h-6 text-blue-600" />
               Recherche de Leads
-            </CardTitle>
-            <CardDescription className="text-base">
-              Entrez vos mots-clés (activité + localisation) pour extraire des leads depuis Google Business
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="keywords" className="text-base font-semibold">
-                  Activité / Mots-clés
-                </Label>
-                <Input
-                  id="keywords"
-                  placeholder="Ex: location voiture, restaurant, plombier..."
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  className="text-base h-12"
-                  disabled={isLoading}
-                />
-              </div>
+            </h2>
+            <p className="text-sm text-gray-600">Entrez vos mots-clés (activité + localisation) pour extraire des leads depuis Google Business</p>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="location" className="text-base font-semibold">
-                  Localisation
-                </Label>
-                <Input
-                  id="location"
-                  placeholder="Ex: Montpellier, Paris, Lyon..."
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="text-base h-12"
-                  disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="radius" className="text-base font-semibold">
-                  Zone (rayon en km)
-                </Label>
-                <Input
-                  id="radius"
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={radius}
-                  onChange={(e) => setRadius(Math.min(100, Math.max(1, parseInt(e.target.value) || 10)))}
-                  className="text-base h-12"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 mt-6">
-              <div className="space-y-2">
-                <Label htmlFor="maxLeads" className="text-base font-semibold">
-                  Nombre de leads (max 100)
-                </Label>
-                <Input
-                  id="maxLeads"
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={maxLeads}
-                  onChange={(e) => setMaxLeads(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
-                  className="text-base h-12"
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="flex items-end">
-                <div className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg w-full">
-                  <p className="font-semibold mb-1">Zone de recherche :</p>
-                  <p>{location || 'Non définie'} - Rayon: {radius} km</p>
-                </div>
-              </div>
-            </div>
-
-            {error && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                <p className="text-red-800">{error}</p>
-              </div>
-            )}
-
-            <div className="mt-6 flex gap-4">
-              <Button
-                onClick={scrapLeads}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <label className="block text-base font-semibold mb-2">Activité / Mots-clés</label>
+              <input
+                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ex: location voiture, restaurant, plombier..."
+                value={keywords}
+                onChange={(e) => setKeywords(e.target.value)}
                 disabled={isLoading}
-                className="flex-1 h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Recherche en cours... {progress}%
-                  </>
-                ) : (
-                  <>
-                    <Search className="w-5 h-5 mr-2" />
-                    Lancer la recherche
-                  </>
-                )}
-              </Button>
+              />
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label className="block text-base font-semibold mb-2">Localisation</label>
+              <input
+                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Ex: Montpellier, Paris, Lyon..."
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-base font-semibold mb-2">Zone (rayon en km)</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={radius}
+                onChange={(e) => setRadius(Math.min(100, Math.max(1, parseInt(e.target.value) || 10)))}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 mt-6">
+            <div>
+              <label className="block text-base font-semibold mb-2">Nombre de leads (max 100)</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={maxLeads}
+                onChange={(e) => setMaxLeads(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
+                disabled={isLoading}
+              />
+            </div>
+            <div className="flex items-end">
+              <div className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg w-full">
+                <p className="font-semibold mb-1">Zone de recherche :</p>
+                <p>{location || 'Non définie'} - Rayon: {radius} km</p>
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <p className="text-red-800">{error}</p>
+            </div>
+          )}
+
+          <div className="mt-6">
+            <button
+              onClick={scrapLeads}
+              disabled={isLoading}
+              className="w-full h-12 text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Recherche en cours... {progress}%
+                </>
+              ) : (
+                <>
+                  <Search className="w-5 h-5" />
+                  Lancer la recherche
+                </>
+              )}
+            </button>
+          </div>
+        </div>
 
         {leads.length > 0 && (
           <>
             <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="flex-1 w-full sm:w-auto">
-                <Input
-                  placeholder="Filtrer les résultats..."
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  className="h-11"
-                />
-              </div>
-              <div className="flex gap-3 w-full sm:w-auto">
-                <Button
+              <input
+                placeholder="Filtrer les résultats..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                className="w-full sm:w-1/3 h-11 px-4 border border-gray-300 rounded-lg"
+              />
+              <div className="flex gap-3">
+                <button
                   onClick={exportToCSV}
-                  variant="outline"
-                  className="flex-1 sm:flex-none h-11"
+                  className="h-11 px-4 border border-gray-300 rounded-lg flex items-center gap-2 hover:bg-gray-50"
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  CSV
-                </Button>
-                <Button
+                  <Download className="w-4 h-4" /> CSV
+                </button>
+                <button
                   onClick={exportToJSON}
-                  variant="outline"
-                  className="flex-1 sm:flex-none h-11"
+                  className="h-11 px-4 border border-gray-300 rounded-lg flex items-center gap-2 hover:bg-gray-50"
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  JSON
-                </Button>
+                  <Download className="w-4 h-4" /> JSON
+                </button>
               </div>
             </div>
 
@@ -379,87 +350,54 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredLeads.map((lead) => (
-                <Card key={lead.id} className="hover:shadow-lg transition-shadow border-2">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-lg leading-tight">
-                        {lead.company}
-                      </CardTitle>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${getQualityColor(lead.quality)}`}>
-                        {getQualityLabel(lead.quality)}
-                      </span>
-                    </div>
-                    <CardDescription className="text-sm">
-                      {lead.category}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+                <div key={lead.id} className="border rounded-lg shadow p-4 bg-white hover:shadow-lg transition">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-bold leading-tight">{lead.company}</h3>
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${getQualityColor(lead.quality)}`}>
+                      {getQualityLabel(lead.quality)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">{lead.category}</p>
+
+                  <div className="space-y-2 text-sm">
                     <div className="flex items-start gap-2">
-                      <Phone className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
-                      <a href={`tel:${lead.phone}`} className="text-sm hover:text-blue-600 transition-colors">
-                        {lead.phone}
-                      </a>
+                      <Phone className="w-4 h-4 text-blue-600 mt-1" />
+                      <a href={`tel:${lead.phone}`} className="hover:text-blue-600">{lead.phone}</a>
                     </div>
-                    
                     <div className="flex items-start gap-2">
-                      <Mail className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
-                      <a href={`mailto:${lead.email}`} className="text-sm hover:text-blue-600 transition-colors break-all">
-                        {lead.email}
-                      </a>
+                      <Mail className="w-4 h-4 text-blue-600 mt-1" />
+                      <a href={`mailto:${lead.email}`} className="hover:text-blue-600 break-all">{lead.email}</a>
                     </div>
-                    
                     <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {lead.address}
-                      </p>
+                      <MapPin className="w-4 h-4 text-blue-600 mt-1" />
+                      <p className="text-gray-600 line-clamp-2">{lead.address}</p>
                     </div>
-                    
                     <div className="flex items-start gap-2">
-                      <Globe className="w-4 h-4 text-blue-600 mt-1 flex-shrink-0" />
-                      <a 
-                        href={lead.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm hover:text-blue-600 transition-colors break-all"
-                      >
+                      <Globe className="w-4 h-4 text-blue-600 mt-1" />
+                      <a href={lead.website} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 break-all">
                         {lead.website}
                       </a>
                     </div>
-                    
                     <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 text-green-600 mt-1 flex-shrink-0" />
-                      <a 
-                        href={lead.googleMapsUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm hover:text-green-600 transition-colors font-semibold"
-                      >
+                      <MapPin className="w-4 h-4 text-green-600 mt-1" />
+                      <a href={lead.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="hover:text-green-600 font-semibold">
                         Voir sur Google Maps
                       </a>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           </>
         )}
 
         {!isLoading && leads.length === 0 && (
-          <Card className="text-center py-12 border-2 border-dashed">
-            <CardContent>
-              <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-xl text-gray-600 mb-2">
-                Aucun lead extrait pour le moment
-              </p>
-              <p className="text-gray-500">
-                Entrez vos mots-clés (activité + localisation) pour extraire des leads depuis Google Business
-              </p>
-              <p className="text-sm text-gray-400 mt-2">
-                Sources: Google Business Profile, Google Maps, Pages Jaunes
-              </p>
-            </CardContent>
-          </Card>
+          <div className="text-center py-12 border-2 border-dashed rounded-lg">
+            <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-xl text-gray-600 mb-2">Aucun lead extrait pour le moment</p>
+            <p className="text-gray-500">Entrez vos mots-clés (activité + localisation) pour extraire des leads depuis Google Business</p>
+            <p className="text-sm text-gray-400 mt-2">Sources: Google Business Profile, Google Maps, Pages Jaunes</p>
+          </div>
         )}
       </div>
     </div>
