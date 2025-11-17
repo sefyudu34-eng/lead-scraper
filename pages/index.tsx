@@ -14,16 +14,6 @@ interface Lead {
 }
 
 
-
-export default function Home() {
-  return (
-    <div>
-      <h1>Bienvenue sur Lead Scraper</h1>
-      <p>Commence à extraire des leads dès maintenant !</p>
-    </div>
-  );
-}
-
 export default function LeadScraperApp() {
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
