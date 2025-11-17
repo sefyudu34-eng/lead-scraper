@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2, Search, Download, Mail, Phone, MapPin, Globe, AlertCircle } from 'lucide-react';
- 
+
 interface Lead {
   id: string;
   company: string;
@@ -13,7 +13,6 @@ interface Lead {
   quality: 'high' | 'medium' | 'low';
 }
 
-
 export default function LeadScraperApp() {
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
@@ -21,8 +20,6 @@ export default function LeadScraperApp() {
   const [maxLeads, setMaxLeads] = useState(50);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [searchFilter, setSearchFilter] = useState('');
   const [error, setError] = useState('');
 
   const scrapLeads = async () => {
@@ -37,85 +34,15 @@ export default function LeadScraperApp() {
 
     setIsLoading(true);
     setError('');
-    setProgress(0);
     setLeads([]);
 
     try {
-      const systemPrompt = `Tu es un expert en web scraping et extraction de leads B2B à partir de Google Business Profile (anciennement Google My Business).
-
-SOURCES DE DONNÉES:
-- Google Business Profile / Google Maps
-- Pages Jaunes (pagesjaunes.fr)
-- Annuaires professionnels locaux
-- Recherches Google Business locales
-
-Pour chaque lead, tu dois extraire et fournir:
-- company: nom exact de l'entreprise tel qu'il apparaît sur Google Business
-- phone: numéro de téléphone français (format: 0X XX XX XX XX) extrait du profil Google Business
-- email: email professionnel (contact@entreprise.fr ou info@entreprise.fr) trouvé sur Google Business ou le site web
-- address: adresse complète exacte depuis Google Maps/Business
-- website: site web officiel de l'entreprise
-- googleMapsUrl: lien Google Maps direct vers l'entreprise (format: https://maps.google.com/?cid=XXXXXXXXX ou https://goo.gl/maps/XXXXX)
-- category: catégorie d'activité selon Google Business (ex: Restaurant, Plombier, Location de voiture)
-- quality: niveau de qualité basé sur:
-  * high: profil Google Business complet avec avis 4+, site web actif, toutes infos présentes
-  * medium: profil Google Business avec infos de base, quelques avis
-  * low: profil minimal ou informations incomplètes
-
-MÉTHODOLOGIE D'EXTRACTION:
-1. Recherche sur Google Business avec les mots-clés fournis
-2. Extraction des entreprises correspondantes dans la zone géographique
-3. Collecte des informations de contact depuis les profils Google Business
-4. Vérification de la présence d'un site web et d'avis clients
-5. Qualification des leads selon les critères de qualité
-
-IMPORTANT:
-- Les données doivent provenir de sources réelles (Google Business, annuaires)
-- Les numéros de téléphone doivent être au format français valide et publiquement disponibles
-- Les emails doivent correspondre au domaine de l'entreprise
-- Prioriser les entreprises avec profils Google Business vérifiés
-- Inclure uniquement des entreprises actives et vérifiables
-- Distribue les niveaux de qualité: 40% high, 40% medium, 20% low
-
-Réponds UNIQUEMENT avec un tableau JSON valide, sans texte additionnel.`;
-
-      const userPrompt = `Extrais exactement ${maxLeads} leads qualifiés depuis Google Business Profile pour la recherche: "${keywords}" dans la zone: "${location}" (rayon: ${radius} km)
-
-PROCESSUS D'EXTRACTION:
-1. Effectue une recherche Google Business/Maps avec ces mots-clés dans la zone géographique spécifiée
-2. Identifie les entreprises dans un rayon de ${radius} km autour de ${location}
-3. Extrais les informations de contact depuis leurs profils Google Business
-4. Récupère le lien Google Maps direct de chaque entreprise
-5. Vérifie la présence d'un site web et d'avis clients
-6. Qualifie chaque lead selon la complétude de son profil Google Business
-
-CRITÈRES DE SÉLECTION:
-- Entreprises avec profil Google Business actif dans la zone ${location} (rayon ${radius} km)
-- Numéros de téléphone publiquement affichés
-- Emails disponibles sur le profil ou le site web
-- Lien Google Maps direct vers l'établissement
-- Entreprises vérifiées ou avec avis clients
-
-Réponds avec un tableau JSON contenant ${maxLeads} objets avec cette structure:
-[
-  {
-    "company": "Nom exact depuis Google Business",
-    "phone": "0X XX XX XX XX",
-    "email": "contact@entreprise.fr",
-    "address": "Adresse complète depuis Google Maps",
-    "website": "https://www.entreprise.fr",
-    "googleMapsUrl": "https://maps.google.com/?cid=XXXXXXXXX",
-    "category": "Catégorie Google Business",
-    "quality": "high"
-  }
-]
-
-Note: Tous les leads doivent être extraits de sources publiques vérifiables (Google Business Profile, Google Maps, annuaires en ligne).`;
+      const systemPrompt = `Tu es un expert en web scraping et extraction de leads B2B à partir de Google Business Profile.`;
+      const userPrompt = `Extrais ${maxLeads} leads pour "${keywords}" à "${location}" (rayon ${radius} km)`;
 
       const response = await fetch('https://llm.blackbox.ai/chat/completions', {
         method: 'POST',
         headers: {
-          'customerId': 'cus_TNfmYissyU6g42',
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`
         },
@@ -129,34 +56,20 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des leads');
-      }
-
       const data = await response.json();
       const content = data.choices[0].message.content;
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) throw new Error('Format invalide');
 
-      let parsedLeads: Lead[];
-      try {
-        const jsonMatch = content.match(/\[[\s\S]*\]/);
-        if (!jsonMatch) {
-          throw new Error('Format de réponse invalide');
-        }
-        parsedLeads = JSON.parse(jsonMatch[0]);
-      } catch (parseError) {
-        throw new Error('Impossible de parser les résultats');
-      }
-
+      const parsedLeads: Lead[] = JSON.parse(jsonMatch[0]);
       const leadsWithIds = parsedLeads.map((lead, index) => ({
         ...lead,
         id: `lead-${Date.now()}-${index}`
       }));
 
       setLeads(leadsWithIds);
-      setProgress(100);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
-      console.error('Erreur:', err);
+      setError(err instanceof Error ? err.message : 'Erreur inconnue');
     } finally {
       setIsLoading(false);
     }
@@ -172,7 +85,6 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
           .join(',')
       )
     ].join('\n');
-
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -305,7 +217,7 @@ Note: Tous les leads doivent être extraits de sources publiques vérifiables (G
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Recherche en cours... {progress}%
+                  Recherche en cours...
                 </>
               ) : (
                 <>
