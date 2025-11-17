@@ -21,6 +21,7 @@ export default function LeadScraperApp() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [searchFilter, setSearchFilter] = useState('');
 
   const scrapLeads = async () => {
     if (!keywords.trim()) {
